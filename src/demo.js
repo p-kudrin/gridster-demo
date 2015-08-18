@@ -8,7 +8,7 @@ $(document).ready(function () {
 	var jsPlumbInstance = jsPlumb.getInstance();
 	jsPlumbInstance.importDefaults({
             Anchors: ["Right", "Left"],
-            Connector: ["NewFlowchart", { stub: 10, midpoint: 0.5, cornerRadius: 30 }],
+            Connector: ["Flowchart", { stub: 10, midpoint: 0.5, cornerRadius: 30 }],
             EndpointStyle: { fillStyle: "gray", radius: 0.1 },
             PaintStyle: { strokeStyle: "gray", lineWidth: 4 },
             HoverPaintStyle: { strokeStyle: "rgb(255,159,64)", lineWidth: 4 },
@@ -70,8 +70,7 @@ $(document).ready(function () {
 				var c = jsPlumbInstance.connect({
             		source: source,
             		target: target,
-            		container: container,
-            		connector: ["Flowchart", { stub: 10, cornerRadius: 30 }]
+            		container: container
         		});
         		numClick = 0;
 			}
