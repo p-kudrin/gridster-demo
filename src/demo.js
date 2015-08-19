@@ -3,6 +3,24 @@ $(document).ready(function () {
 		widget_selector: ".box",
 		widget_margins: [10, 10],
 		widget_base_dimensions: [100, 60],
+		draggable: {
+			drag: function (event, ui) {
+				// jsPlumb.repaint() is broken in jsPlumb v.1.7.6 but correct for v.1.5.2
+				// so we use repaintEverything() instead
+
+				//jsPlumbInstance.repaint(ui.$player.attr("id"));
+
+				jsPlumbInstance.repaintEverything();
+			},
+			stop: function (event, ui) {
+				// jsPlumb.repaint() is broken in jsPlumb v.1.7.6 but correct for v.1.5.2
+				// so we use repaintEverything() instead
+
+				//jsPlumbInstance.repaint(ui.$player.attr("id"));
+
+				jsPlumbInstance.repaintEverything();
+			}
+		}
 	}).data('gridster');
 
 	var jsPlumbInstance = jsPlumb.getInstance();
@@ -16,6 +34,7 @@ $(document).ready(function () {
         });
 
 	function addBox () {
+		unbindHover();
 		var container = $(".container");
 		container.off("click.newnode");		
 		container.css("cursor", "crosshair");
@@ -36,11 +55,13 @@ $(document).ready(function () {
 	};
 
 	function cancelAddBox () {
-		var container = $(".container");
+		var container = $(".container"),
+			boxes = $('.box');
+		bindHover();
 		container.css("cursor", "default");
-		$('.box').css("cursor", "default");
+		boxes.css("cursor", "default");
 		container.off("click.newnode");
-		container.off("click.connector");
+		boxes.off("click.connector");
 	};
 
 	function getCoords (posX, posY) {
@@ -54,14 +75,15 @@ $(document).ready(function () {
 	};
 
 	function addConnector () {		
-		var container = $(".container");
-		container.off("click.connector");
+		var container = $(".container"),
+			boxes = $('.box');
+		boxes.off("click.connector");
 		container.css("cursor", "crosshair");
-        $('.box').css("cursor", "crosshair");
+        boxes.css("cursor", "crosshair");
         var target,
         	source,
         	numClick = 0;
-        $('.box').on('click.connector', function (event) {
+        boxes.on('click.connector', function (event) {
 			numClick += 1;
 			if (numClick == 1) {
 				source = $(this);
@@ -76,6 +98,34 @@ $(document).ready(function () {
 			}
 
         });
+	};
+
+	function bindHover () {
+		$('.box').hover(
+			function (inEvent) {
+				var $this = $(this);
+				$this.addClass("box_hover");
+				jsPlumbInstance.getConnections({source: $this}).forEach(function (conn) {
+					conn.setPaintStyle({ strokeStyle: "rgb(255,159,64)", lineWidth: 4 }, false);
+				});
+				jsPlumbInstance.getConnections({target: $this}).forEach(function (conn) {
+					conn.setPaintStyle({ strokeStyle: "rgb(255,159,64)", lineWidth: 4 }, false);
+				});
+			},
+			function (outEvent) {
+				var $this = $(this);
+				$this.removeClass("box_hover");
+				jsPlumbInstance.getConnections({source: $this}).forEach(function (conn) {
+					conn.setPaintStyle({ strokeStyle: "gray", lineWidth: 4 }, false);
+				});
+				jsPlumbInstance.getConnections({target: $this}).forEach(function (conn) {
+					conn.setPaintStyle({ strokeStyle: "gray", lineWidth: 4 }, false);
+				});
+			});
+	};
+
+	function unbindHover () {
+		$('.box').off("mouseenter mouseleave");
 	};
 
 	$('#addBoxBtn').on('click', function () {

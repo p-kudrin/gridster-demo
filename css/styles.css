@@ -33,3 +33,7 @@
   border: 1px solid transparent;
   border-radius: 4px;
 }
+
+.box_hover, ._jsPlumb_target_hover, ._jsPlumb_source_hover {
+	border-color: rgb(255,159,64);
+}
