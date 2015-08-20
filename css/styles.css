@@ -12,6 +12,10 @@
     border: 3px solid;    
 }
 
+.sourseNode, .potentialitySourse:hover {    
+    border-color: rgb(81, 204, 40);
+}
+
 .btn {
   display: inline-block;
   padding: 6px 12px;
@@ -32,6 +36,10 @@
   background-image: none;
   border: 1px solid transparent;
   border-radius: 4px;
+}
+
+.active {
+	border-color: blue;
 }
 
 .box_hover, ._jsPlumb_target_hover, ._jsPlumb_source_hover {

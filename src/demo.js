@@ -20,7 +20,10 @@ $(document).ready(function () {
 
 				jsPlumbInstance.repaintEverything();
 			}
-		}
+		},
+		on_move_widget_down: function (el) {
+	        jsPlumbInstance.repaintEverything();
+	    },
 	}).data('gridster');
 
 	var jsPlumbInstance = jsPlumb.getInstance();
@@ -33,7 +36,10 @@ $(document).ready(function () {
             Overlays: [["Arrow", { location: 1, width: 12, length: 10 }]]
         });
 
+	bindHover();
+
 	function addBox () {
+		cancelAll();
 		unbindHover();
 		var container = $(".container");
 		container.off("click.newnode");		
@@ -54,7 +60,7 @@ $(document).ready(function () {
         });
 	};
 
-	function cancelAddBox () {
+	function cancelAll () {
 		var container = $(".container"),
 			boxes = $('.box');
 		bindHover();
@@ -62,7 +68,8 @@ $(document).ready(function () {
 		boxes.css("cursor", "default");
 		container.off("click.newnode");
 		boxes.off("click.connector");
-	};
+		boxes.removeClass("sourseNode potentialitySourse");
+	};	
 
 	function getCoords (posX, posY) {
 	    var col = Math.floor(posX / grid.min_widget_width) + 1,
@@ -74,12 +81,14 @@ $(document).ready(function () {
 	    return pos;
 	};
 
-	function addConnector () {		
+	function addConnector () {
+		cancelAll();
 		var container = $(".container"),
 			boxes = $('.box');
 		boxes.off("click.connector");
 		container.css("cursor", "crosshair");
         boxes.css("cursor", "crosshair");
+        boxes.addClass("potentialitySourse");
         var target,
         	source,
         	numClick = 0;
@@ -87,6 +96,7 @@ $(document).ready(function () {
 			numClick += 1;
 			if (numClick == 1) {
 				source = $(this);
+				source.addClass("sourseNode");
 			} else if (numClick == 2) {
 				target = $(this);
 				var c = jsPlumbInstance.connect({
@@ -95,6 +105,7 @@ $(document).ready(function () {
             		container: container
         		});
         		numClick = 0;
+        		source.removeClass("sourseNode");
 			}
 
         });
@@ -128,15 +139,25 @@ $(document).ready(function () {
 		$('.box').off("mouseenter mouseleave");
 	};
 
+	function deactivateBtn () {
+		$(".btn").removeClass("active");
+	}
+
 	$('#addBoxBtn').on('click', function () {
+		deactivateBtn();
+		$(this).addClass("active");
 		addBox();
 	});
 
 	$('#addConnBtn').on('click', function () {
+		deactivateBtn();
+		$(this).addClass("active");
 		addConnector();
 	});
 
 	$('#cancelBoxBtn').on('click', function () {
-		cancelAddBox();
+		deactivateBtn();
+		$(this).addClass("active");
+		cancelAll();
 	});
 });

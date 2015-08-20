@@ -17,6 +17,50 @@
         return this;
     };
 
+    Gridster.prototype.move_widget_down = function($widget, y_units) {
+        var el_grid_data, actual_row, moved, y_diff;
+
+        if (y_units <= 0) { return false; }
+
+        el_grid_data = $widget.coords().grid;
+        actual_row = el_grid_data.row;
+        moved = [];
+        y_diff = y_units;
+
+        if (!$widget) { return false; }
+
+        if ($.inArray($widget, moved) === -1) {
+
+            var widget_grid_data = $widget.coords().grid;
+            var next_row = actual_row + y_units;
+            var $next_widgets = this.widgets_below($widget);
+
+            this.remove_from_gridmap(widget_grid_data);
+
+            $next_widgets.each($.proxy(function(i, widget) {
+                var $w = $(widget);
+                var wd = $w.coords().grid;
+                var tmp_y = this.displacement_diff(
+                             wd, widget_grid_data, y_diff);
+
+                if (tmp_y > 0) {
+                    this.move_widget_down($w, tmp_y);
+                }
+            }, this));
+
+            widget_grid_data.row = next_row;
+            this.update_widget_position(widget_grid_data, $widget);
+            $widget.attr('data-row', widget_grid_data.row);
+            this.$changed = this.$changed.add($widget);
+
+            if (this.options.on_move_widget_down) {
+                this.options.on_move_widget_down.call(this, $widget);
+            }
+
+            moved.push($widget);
+        }
+    };
+
     Gridster.prototype.set_placeholder = function(col, row) {
         var phgd = $.extend({}, this.placeholder_grid_data);
         var $nexts = this.widgets_below({
